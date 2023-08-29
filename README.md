@@ -1,4 +1,4 @@
-- 👋 Hi, I’m @mizutokei
+- 👋 Hi, I’m @mizukiterai
 - 👀 I’m interested in ... learning about programming
 - 🌱 I’m currently learning ... c language
 - 💞️ I’m looking to collaborate on ... anyone that is able to reach out to me

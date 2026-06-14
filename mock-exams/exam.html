@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#1a1a2e">
+<title>Claude Certified Architect — Mock Exams</title>
+<style>
+  :root{
+    --bg:#0f1020; --card:#1a1b2e; --card2:#22243d; --ink:#e8e9f3; --muted:#9aa0bf;
+    --accent:#c98a5e; --accent2:#7aa2f7; --ok:#4ec9a3; --bad:#f0698e; --line:#2c2e4a;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--bg); color:var(--ink);
+    font:16px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  }
+  .wrap{max-width:760px;margin:0 auto;padding:18px 16px 120px}
+  header h1{font-size:20px;margin:6px 0 2px;letter-spacing:.2px}
+  header p{color:var(--muted);margin:0 0 16px;font-size:13px}
+  .pickrow{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+  .pick{flex:1;min-width:90px;background:var(--card);border:1px solid var(--line);color:var(--ink);
+    padding:12px 10px;border-radius:14px;font-size:14px;font-weight:600;cursor:pointer;text-align:center}
+  .pick.active{border-color:var(--accent);background:linear-gradient(180deg,#2a2238,#1f2036);color:#fff}
+  .pick small{display:block;color:var(--muted);font-weight:400;font-size:11px;margin-top:2px}
+  .meta{display:flex;justify-content:space-between;align-items:center;color:var(--muted);font-size:12px;margin:4px 2px 14px}
+  .sec{margin:22px 0 8px;font-size:13px;text-transform:uppercase;letter-spacing:1px;color:var(--accent)}
+  .q{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px 14px 8px;margin:12px 0}
+  .q .qt{font-weight:600;margin-bottom:10px}
+  .q .qt .num{color:var(--accent2);margin-right:6px}
+  .opt{display:flex;align-items:flex-start;gap:10px;padding:11px 12px;margin:7px 0;border:1px solid var(--line);
+    border-radius:12px;background:var(--card2);cursor:pointer;transition:.12s}
+  .opt:active{transform:scale(.995)}
+  .opt .box{flex:none;width:22px;height:22px;border-radius:6px;border:2px solid var(--muted);
+    display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:transparent;margin-top:1px}
+  .opt.single .box{border-radius:50%}
+  .opt.sel{border-color:var(--accent2);background:#243056}
+  .opt.sel .box{background:var(--accent2);border-color:var(--accent2);color:#0b1020}
+  .opt .ol{font-weight:700;margin-right:2px;color:var(--muted)}
+  /* graded states */
+  .opt.correct{border-color:var(--ok);background:#16382f}
+  .opt.correct .box{background:var(--ok);border-color:var(--ok);color:#06241b}
+  .opt.wrong{border-color:var(--bad);background:#3a1c28}
+  .opt.wrong .box{background:var(--bad);border-color:var(--bad);color:#2a0a12}
+  .opt.missed{border-color:var(--ok);border-style:dashed}
+  .exp{display:none;margin:8px 2px 4px;padding:10px 12px;border-left:3px solid var(--accent);
+    background:#181a30;border-radius:0 10px 10px 0;font-size:14px;color:#d4d6ea}
+  .exp.show{display:block}
+  .exp b{color:var(--ok)}
+  .scn .qt{margin-bottom:8px}
+  .scn textarea{width:100%;min-height:90px;background:var(--card2);color:var(--ink);border:1px solid var(--line);
+    border-radius:12px;padding:10px;font:15px/1.45 inherit;resize:vertical}
+  .reveal{margin-top:8px;background:transparent;border:1px solid var(--line);color:var(--accent2);
+    padding:8px 12px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer}
+  .model{display:none;margin-top:8px;padding:10px 12px;background:#181a30;border-radius:10px;font-size:14px;color:#d4d6ea}
+  .model.show{display:block}
+  .model b{color:var(--ok)}
+  .bar{position:fixed;left:0;right:0;bottom:0;background:rgba(15,16,32,.92);backdrop-filter:blur(10px);
+    border-top:1px solid var(--line);padding:12px 16px calc(12px + env(safe-area-inset-bottom));display:flex;gap:10px;align-items:center}
+  .bar .score{flex:1;font-size:14px;color:var(--muted)}
+  .bar .score b{color:var(--ink);font-size:16px}
+  .btn{background:var(--accent);color:#1a0f08;border:none;padding:13px 18px;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer}
+  .btn.ghost{background:transparent;color:var(--muted);border:1px solid var(--line);font-weight:600}
+  .pass{color:var(--ok)!important}.fail{color:var(--bad)!important}
+  .hint{color:var(--muted);font-size:12px;margin:2px 2px 0}
+  .note{background:#181a30;border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-size:12px;color:var(--muted);margin-bottom:8px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Claude Certified Architect</h1>
+    <p>Mock exam pack · 3 forms · tap answers, then Grade. Works offline.</p>
+  </header>
+
+  <div class="pickrow" id="picker"></div>
+  <div class="note">Sections 1–2 are auto-graded. Section 3 (scenarios) shows a model answer to self-check. Passing score: <b>75 / 100</b>.</div>
+  <div class="meta"><span id="formName"></span><span id="progress"></span></div>
+
+  <div id="exam"></div>
+</div>
+
+<div class="bar">
+  <div class="score" id="scoreBox">Not graded yet</div>
+  <button class="btn ghost" id="resetBtn">Reset</button>
+  <button class="btn" id="gradeBtn">Grade</button>
+</div>
+
+<script>
+/* ---------------- DATA ---------------- */
+const O=(a,b,c,d)=>({A:a,B:b,C:c,D:d});
+const EXAMS={
+A:{name:"Form A — Foundational",
+ single:[
+  ["A1","Every text generation request to Claude — including tool use and structured outputs — goes through which single API endpoint?",O("POST /v1/completions","POST /v1/messages","POST /v1/chat","A different endpoint per feature"),"B","All generation flows through <b>POST /v1/messages</b>; tools, structured outputs and thinking are features of it."],
+  ["A2","model=\"claude-sonnet-4-6-20251114\" gives a 404. Most likely cause?",O("Sonnet 4.6 has been retired","Don't append a date suffix; use claude-sonnet-4-6","Missing anthropic-version header","Date-suffixed IDs need a beta header"),"B","Use the exact alias <b>claude-sonnet-4-6</b> — never append a recalled date suffix."],
+  ["A3","Correct default model for general production work?",O("claude-haiku-4-5","claude-fable-5","claude-opus-4-8","claude-sonnet-4-5"),"C","<b>claude-opus-4-8</b> is the production default unless the user picks another model."],
+  ["A4","Force Claude to return JSON matching a fixed schema. Recommended mechanism?",O("Prefill the assistant turn with {","The deprecated output_format parameter","output_config:{format:{type:'json_schema',schema:...}}","A regex post-processor"),"C","Structured outputs via <b>output_config.format</b>; output_format is deprecated and prefill is removed on current models."],
+  ["A5","Prompt caching is fundamentally a:",O("Semantic similarity match","Prefix match on exact rendered bytes up to a cache_control breakpoint","Hash of the user's final message only","Cache of model weights per org"),"B","Caching is a <b>prefix match on exact bytes</b> up to a breakpoint."],
+  ["A6","Render order that determines the cacheable prefix:",O("messages → system → tools","system → messages → tools","tools → system → messages","Whatever order you pass fields"),"C","Render order is <b>tools → system → messages</b>."],
+  ["A7","Putting datetime.now() into your system prompt every request will:",O("Improve cache hit rate","Invalidate the cache every request","No effect on caching","Cause a 400"),"B","A per-request timestamp changes the prefix bytes → <b>cache invalidated every time</b>."],
+  ["A8","Enable extended reasoning on claude-opus-4-8:",O("thinking:{type:'enabled',budget_tokens:8000}","thinking:{type:'adaptive'}","temperature:0 + 'think step by step'","reasoning:true"),"B","<b>Adaptive thinking</b> is the on-mode for Opus 4.8."],
+  ["A9","On opus-4-8, thinking:{type:'enabled',budget_tokens:N} gives:",O("Success, caps thinking at N","A 400 — fixed budgets removed on this model","Silent fallback to adaptive","A 429"),"B","Fixed <b>budget_tokens is removed</b> on Opus 4.8 → 400."],
+  ["A10","The effort parameter is placed:",O("Top level of the request","Inside output_config","Inside thinking","In a beta header"),"B","<b>effort</b> lives inside output_config."],
+  ["A11","A tool_result block must always include:",O("The is_error field","A matching tool_use_id","The original input_schema","A cache_control marker"),"B","Each tool_result must carry the matching <b>tool_use_id</b>."],
+  ["A12","When Claude wants to call a tool, stop_reason is:",O("end_turn","tool_use","pause_turn","max_tokens"),"B","<b>tool_use</b> signals Claude wants a tool executed."],
+  ["A13","A server-side tool that runs entirely on Anthropic's infra:",O("A custom get_weather function","Code execution","The client-side bash reference impl","A local MCP stdio server"),"B","<b>Code execution</b> runs fully on Anthropic infrastructure."],
+  ["A14","Batches API discount vs standard pricing:",O("10%","25%","50%","90%"),"C","Batches are <b>~50%</b> cheaper."],
+  ["A15","Large max_tokens (100K) non-streaming is risky because:",O("Always returns 413","Idle HTTP connections can time out","Large outputs aren't billed","max_tokens above 16K is rejected"),"B","Big non-streamed outputs risk <b>idle-connection HTTP timeouts</b>; stream instead."],
+  ["A16","SDKs auto-retry which errors with backoff?",O("All 4xx","400 and 401","408, 409, 429, and ≥500","None"),"C","SDK auto-retries <b>408, 409, 429, ≥500</b>."],
+  ["A17","Which field confirms a prompt-cache hit?",O("usage.cache_read_input_tokens","usage.output_tokens","stop_reason","usage.input_tokens"),"A","<b>cache_read_input_tokens &gt; 0</b> confirms a hit."],
+  ["A18","Chat UI showing tokens as produced should use:",O("Poll the Batches API","Streaming (messages.stream())","max_tokens:0","The Files API"),"B","<b>Streaming</b> displays tokens as produced."],
+  ["A19","In multi-turn, the Messages API is:",O("Stateful — server remembers turns","Stateless — send full history each request","Stateful only when caching is on","Stateful for first 10 turns"),"B","The API is <b>stateless</b>; send full history each request."],
+  ["A20","Cheapest model for simple high-volume classification:",O("claude-opus-4-8","claude-fable-5","claude-haiku-4-5","claude-opus-4-7"),"C","<b>claude-haiku-4-5</b> is cheapest/fastest for simple high-volume tasks."],
+  ["A21","Count tokens accurately by:",O("Using tiktoken","count_tokens endpoint with same model ID","char count / 4","Reading input_tokens from an unrelated request"),"B","Use <b>count_tokens</b> with the same model; never tiktoken."],
+  ["A22","Managed Agents mandatory flow:",O("Session first, then Agent","Agent (once) → Session (every run)","Environment → Vault only","Tool → Skill"),"B","<b>Agent once → Session every run</b>."],
+  ["A23","In Managed Agents, model/system/tools live on:",O("The session","The environment","The agent object","The vault"),"C","They live on the <b>agent</b>, not the session."],
+  ["A24","HTTP 200 with stop_reason:'refusal' — before reading content[0]:",O("Retry immediately, same prompt","Check stop_reason and handle the refusal","Assume content is valid JSON","Auto-switch to a smaller model"),"B","Check <b>stop_reason</b> first; refused content may be empty."],
+  ["A25","Surface with Anthropic-operated same-day parity + AWS IAM/billing:",O("Amazon Bedrock","Google Vertex AI","Claude Platform on AWS","Microsoft Foundry"),"C","<b>Claude Platform on AWS</b> is Anthropic-operated with same-day parity."]
+ ],
+ multi:[
+  ["B1","Which will silently invalidate a prompt cache?",O("uuid4() early in the system prompt","json.dumps() without sorted keys in the prefix","Changing the tool set mid-conversation","Reading usage.cache_read_input_tokens"),["A","B","C"],"A/B/C all change the prefix; reading a usage field does not."],
+  ["B2","Valid stop_reason values:",O("end_turn","tool_use","refusal","cache_miss"),["A","B","C"],"cache_miss is not a stop reason."],
+  ["B3","True about tool runner vs manual loop:",O("Runner executes tools automatically and loops","Manual loop preferred for human-in-the-loop approval","Runner generates schemas from signatures/typed schemas","Manual loop cannot stream"),["A","B","C"],"The manual loop can stream (D false)."],
+  ["B4","Characteristics of the Batches API:",O("~50% cost reduction","Most finish within 1h (max 24h)","Supports vision, tools, caching","Results guaranteed in order, no custom_id needed"),["A","B","C"],"Results use custom_id; order isn't guaranteed."],
+  ["B5","Manage context in a long-running agent:",O("Compaction","Context editing","Memory (cross-session)","Lowering max_tokens to 1"),["A","B","C"],"Lowering max_tokens to 1 doesn't manage context."],
+  ["B6","True about claude-fable-5:",O("Thinking always on; explicit disabled → 400","Classifiers may return stop_reason:'refusal'","Requires 30-day data retention","Recommended default for 'upgrade to latest'"),["A","B","C"],"Fable 5 is NOT the default upgrade target (pricing above Opus)."],
+  ["B7","Promote a bash action to a dedicated tool to:",O("Gate a hard-to-reverse action","Render a custom UI","Mark a read-only action parallel-safe","Give Claude maximum unconstrained breadth"),["A","B","C"],"Max breadth is the bash argument, not a reason to promote."],
+  ["B8","Correct cache_control breakpoint placements:",O("Last block of a large shared system prompt","End of the shared prefix when only the question varies","Last block of the most recent turn in chat","On a block with a per-request timestamp"),["A","B","C"],"Never put a breakpoint on a volatile per-request block."]
+ ],
+ scn:[
+  ["C1","Cost & caching: 40K-token KB prepended to every request + short varying question, steady volume. Structure, breakpoint placement, verification?","Put the 40K KB first (stable prefix), varying question last. One cache_control breakpoint at the END of the KB (the shared portion), not after the question. Steady traffic → default 5-min ephemeral TTL keeps it warm. Verify usage.cache_read_input_tokens > 0; if zero, audit for silent invalidators (timestamps/UUIDs, unsorted JSON, varying tools). Keep the system prompt frozen."],
+  ["C2","Reliability: feature generates ~60K-token reports. Request config, failure modes, SDK help?","Use streaming (messages.stream()) with max_tokens ~64K (large outputs require streaming to avoid HTTP timeouts). Get result via get_final_message()/finalMessage(). Handle 429 rate limits, 529 overload, connection drops, stop_reason=='max_tokens' (raise cap/continue). SDK auto-retries 429/5xx with backoff and guards against silent timeout on big non-streamed requests."],
+  ["C3","Architecture: agent edits a GitHub repo, runs tests, opens a PR, Anthropic hosting the sandbox. Surface, object order, credential security?","Use Managed Agents. Order: Environment → Agent (once; declares model/system/tools incl. the GitHub MCP server for PR creation) → Session (every run; mounts github_repository resource + attaches a vault for MCP credentials). The clone token and MCP OAuth credential never enter the container — git ops and MCP calls route through Anthropic-side proxies that inject creds at egress. Flow: edit → push branch via bash → open PR via MCP create_pull_request."]
+ ]
+},
+
+B:{name:"Form B — Intermediate",
+ single:[
+  ["A1","Tools, structured outputs, server tools are best described as:",O("Separate API products w/ own endpoints","Features of the single POST /v1/messages","Only via Managed Agents","Client-side SDK helpers w/ no server"),"B","All are features of <b>/v1/messages</b>."],
+  ["A2","Adaptive thinking differs from fixed budget_tokens because:",O("Always uses max thinking tokens","Claude dynamically decides depth; no budget to tune","Disables tool use","Needs a beta header on every model"),"B","Adaptive lets Claude <b>decide depth dynamically</b>."],
+  ["A3","On opus-4-8, which params are rejected (400)?",O("max_tokens","temperature, top_p, top_k","stop_sequences","system"),"B","<b>Sampling params</b> are removed on Opus 4.8/4.7."],
+  ["A4","Cache write premium for 5-minute TTL ≈",O("0.1× input","1.25× input","2× input","10× input"),"B","5-min TTL write ≈ <b>1.25×</b> base input."],
+  ["A5","Cache reads cost ≈",O("0.1× input","1.0× input","1.25× input","Free"),"A","Reads ≈ <b>0.1×</b> base input."],
+  ["A6","With 5-min TTL, caching breaks even after ~how many requests?",O("1","2","10","100"),"B","Breaks even at <b>~2</b> (1.25× + 0.1× < 2×)."],
+  ["A7","Server-side tool loop hits its iteration limit → stop_reason:",O("end_turn","max_tokens","pause_turn","refusal"),"C","Server tool loop limit → <b>pause_turn</b>."],
+  ["A8","Resume after pause_turn by:",O("New user message 'Continue.'","Re-send user msg + assistant response; server resumes","Start fresh conversation","Switch to streaming"),"B","<b>Re-send</b> the turn; server resumes (no 'Continue.')."],
+  ["A9","Appending assistant response in a manual tool loop:",O("Append only text, drop tool_use","Append full response.content incl. tool_use before results","Never append the assistant turn","Append a summary string"),"B","Append the <b>full content</b> incl. tool_use blocks."],
+  ["A10","Mid-conversation operator instructions that preserve cache:",O("Edit top-level system","Append {role:'system',...} to messages","A new tool definition","A cache_control change"),"B","A <b>role:'system' message</b> preserves the cached prefix."],
+  ["A11","Editing top-level system mid-conversation will:",O("No caching impact","Invalidate the prefix ahead of the whole conversation","Only invalidate tools cache","Return 400"),"B","It <b>invalidates the whole prefix</b>."],
+  ["A12","Max cache_control breakpoints per request:",O("1","4","16","Unlimited"),"B","<b>4</b> breakpoints max."],
+  ["A13","A breakpoint walks back at most how many content blocks?",O("4","10","20","100"),"C","<b>20-block</b> lookback window."],
+  ["A14","Python helper that validates response against your schema:",O("create() + manual json.loads()","messages.parse()","batches.create()","files.upload()"),"B","<b>messages.parse()</b> validates against the schema."],
+  ["A15","JSON Schema feature NOT supported by structured outputs:",O("enum","anyOf","Numerical constraints (minimum/maximum)","additionalProperties:false"),"C","<b>Numerical constraints</b> are unsupported."],
+  ["A16","Compaction (beta) requires which handling each turn?",O("Strip all thinking blocks","Append response.content (not just text)","Disable tool use","Reset max_tokens to 0"),"B","Append <b>response.content</b> to preserve the compaction block."],
+  ["A17","Files API is most appropriate to:",O("Stream tokens to a UI","Reference an uploaded doc by file_id across requests","Cache the system prompt","Run code server-side"),"B","Reference docs by <b>file_id</b> across requests."],
+  ["A18","tool_choice {type:'any'} means:",O("Claude decides (default)","Must use at least one tool","Must use one named tool","Cannot use tools"),"B","<b>any</b> = must use at least one tool."],
+  ["A19","Managed Agents MCP credentials are supplied via:",O("mcp_servers array inline auth","A vault attached via vault_ids","Environment networking config","Session metadata"),"B","MCP creds go in a <b>vault</b> via vault_ids."],
+  ["A20","Correct statement about Managed Agents archiving:",O("Archiving an agent is reversible","Archiving an agent is read-only, no unarchive","Sessions can't be archived","Archiving deletes event history immediately"),"B","Agent archive is <b>permanent/read-only</b>."],
+  ["A21","A 'limited' env with MCP servers silently fails unless you:",O("Set allow_mcp_servers:true or list domains in allowed_hosts","Switch model to Opus","Increase max_tokens","Attach a second vault"),"A","Set <b>allow_mcp_servers</b> or list the domains."],
+  ["A22","Pin a session to a known-good config by:",O("Re-create the agent each run","Pass {type:'agent',id,version:N} on create","Edit the environment","Bare string agent='id' (always latest)"),"B","Pin via <b>{type:'agent',id,version:N}</b>."],
+  ["A23","Fallback for a refused fable-5 request on first-party API:",O("No fallback mechanism","Server-side fallbacks param + server-side-fallback-2026-06-01 beta","Increase effort to max","temperature:0"),"B","Use the <b>server-side fallbacks</b> param + its beta."],
+  ["A24","fable-5 from a ZDR org returns 400 every call. Fix:",O("Add a cache_control block","Fix org data-retention (Fable 5 needs 30-day)","Reduce max_tokens","Remove the system field"),"B","Fable 5 needs <b>30-day retention</b>; ZDR → 400."],
+  ["A25","Best effort level for most coding/agentic on 4.7/4.8/Fable 5:",O("low","medium","xhigh","minimal"),"C","<b>xhigh</b> is the recommended setting."]
+ ],
+ multi:[
+  ["B1","Which changes invalidate ONLY system+messages caches, not tools?",O("Changing system prompt content","Adding/removing a tool","Switching the model","Changing message content"),["A","D"],"System content & message content keep tools cache; tool changes (B) and model switch (C) force a full rebuild."],
+  ["B2","Appropriate uses of the manual agentic loop:",O("Human-in-the-loop approval per call","Custom logging / conditional execution","Per-token streaming with fine control","When you want the SDK to do everything"),["A","B","C"],"D is the tool-runner case."],
+  ["B3","True about server-side tools:",O("Code execution runs in Anthropic sandbox","Web search returns citations","Declared in the tools array","You execute them client-side"),["A","B","C"],"You don't execute server tools (D false)."],
+  ["B4","Valid reasons to pick Sonnet 4.6 over Opus 4.8:",O("Faster for high-volume","Lower per-token cost","Strictly more capable than Opus 4.8","Adequate quality at better economics"),["A","B","D"],"Sonnet isn't strictly more capable than Opus (C false)."],
+  ["B5","True about token counting/tokenizers:",O("tiktoken undercounts Claude tokens","Token counts are model-specific","Fable 5 uses same tokenizer as Opus 4.8","From Opus 4.6/older, counts identical to Fable 5"),["A","B","C"],"From 4.6/older, counts differ (D false)."],
+  ["B6","Valid ways to retry a refused fable-5 request on another model:",O("Server-side fallbacks (first-party/AWS)","SDK client-side refusal-fallback middleware","Hand-rolled retry on opus-4-8 re-sending history","Re-send with temperature:2"),["A","B","C"],"temperature:2 is invalid on Fable 5 and not a fallback."],
+  ["B7","Characteristics of Managed Agents sessions:",O("Reference a pre-created agent by ID","Stream events back to the client","Provision a container as tool workspace","Define model/system inline"),["A","B","C"],"Model/system are on the agent, not inline (D false)."],
+  ["B8","Good practice for max_tokens defaults:",O("~16K non-streaming to avoid timeouts","~64K streaming since timeouts aren't a concern","~256 for classification","Always set to model max regardless of task"),["A","B","C"],"Don't blindly max it for every task (D false)."]
+ ],
+ scn:[
+  ["C1","Agent design (Opus 4.8): keeps spawning subagents for trivial single-file reads; overtriggers a tool because prompt says 'CRITICAL: You MUST use this tool'. Changes and why?","Soften 'CRITICAL: You MUST use this tool' → calibrated 'Use this tool when…' (current Opus follows literally; aggressive language overtriggers). Add subagent guidance: spawn only for parallel/independent work; single-file reads / sequential ops → work directly. Optionally tune effort (e.g. high) and add a 'don't over-engineer / don't ask on minor decisions' instruction."],
+  ["C2","Context at scale: research agent runs hours over hundreds of tool calls; must retain learnings across separate sessions. Three mechanisms + what each does?","Compaction (server-side summarizes earlier context near the window limit — append response.content each turn to keep the compaction block). Context editing (prunes stale tool results/thinking to keep the transcript lean). Memory (file-based store persisting learnings across separate sessions). Editing/compaction = within a session; memory = cross-session."],
+  ["C3","Migration: opus-4-6 with thinking:{enabled,budget_tokens:8000}, temperature:0.7, final assistant prefill {\"name\":\". Migrating to opus-4-8. Required changes + prefill replacement?","Replace thinking:{enabled,budget_tokens} → thinking:{type:'adaptive'} (+ optional output_config.effort) — fixed budgets 400. Remove temperature:0.7 — sampling params 400. Remove the assistant-turn prefill — prefills 400 — replace with structured outputs (output_config.format w/ JSON schema) or a system-prompt instruction. Then set model to claude-opus-4-8."]
+ ]
+},
+
+C:{name:"Form C — Advanced",
+ single:[
+  ["A1","Two parallel requests share a 30K prefix, fired simultaneously. Caching?",O("Both read from cache","Both pay full price — entry readable only after first response begins streaming","Second request errors","One is auto-queued"),"B","A cache entry is readable only after the first response <b>begins streaming</b>."],
+  ["A2","Eliminate first-request cache-miss latency at startup via:",O("max_tokens:1","max_tokens:0 (prefill-only; writes cache, returns immediately)","stream:true and discard","Duplicate the real request"),"B","<b>max_tokens:0</b> prefill-only writes the cache and returns immediately."],
+  ["A3","max_tokens:0 pre-warming is rejected with:",O("A system field","stream:true, thinking enabled, output_config.format, or forced tool_choice","A messages array","The anthropic-version header"),"B","Rejected with stream, thinking, output_config.format, or a forced tool_choice."],
+  ["A4","On a 3,000-token prefix, caching silently won't cache on:",O("claude-sonnet-4-6 (2048 min)","claude-fable-5 (2048 min)","claude-opus-4-8 (4096 min)","claude-sonnet-4-5 (1024 min)"),"C","Opus 4.8 min cacheable prefix is <b>4096</b> → 3K won't cache."],
+  ["A5","A fork sub-call rebuilds system with a 1-char difference:",O("Still reads parent's cache","Misses parent's cache entirely, pays full price","Only tools cache lost","A 400"),"B","One byte differing → <b>full cache miss</b>."],
+  ["A6","thinking disabled on Opus 4.8 — known behavior:",O("Refuses the request","May write longer reasoning into the response; use adaptive or final-answer-only instruction","Ignores the system prompt","Returns empty content"),"B","Disabled thinking can <b>leak reasoning into output</b>."],
+  ["A7","On fable-5, the raw chain of thought is:",O("Always returned in full","Never returned; display:'summarized' gives a summary, default 'omitted' = empty","Returned with a beta header","Returned as redacted_thinking"),"B","Raw CoT <b>never returned</b>; summary via display."],
+  ["A8","Continuing on the SAME fable-5 model, thinking blocks must be:",O("Stripped before sending","Passed back exactly as received; modified blocks rejected","Summarized client-side","Replaced with placeholders"),"B","Pass them back <b>unchanged</b> (incl. empty-text ones)."],
+  ["A9","A fable-5 thinking block replayed to a DIFFERENT model is:",O("Rejected with 400","Dropped from the prompt before pricing (silent, unbilled)","Billed at double rate","Converted to a text block"),"B","<b>Dropped before pricing</b>, typically silently, unbilled."],
+  ["A10","Task Budgets differ from max_tokens because:",O("Hard per-response ceiling the model can't see","Tell the model its loop budget; it sees a countdown and self-moderates","Only apply to streaming","Replace effort"),"B","Model <b>sees the countdown</b> and self-moderates; max_tokens is hidden."],
+  ["A11","Minimum task_budget.total:",O("1,024","20,000","64,000","No minimum"),"B","Minimum is <b>20,000</b> tokens."],
+  ["A12","Which change invalidates EVERYTHING (tools+system+messages)?",O("Toggling thinking","Changing tool_choice","Add/remove/reorder a tool definition","Changing the last user message"),"C","<b>Tool definition changes</b> invalidate everything."],
+  ["A13","A turn appends 30 tool blocks; next request misses cache because:",O("TTL expired","20-block lookback exceeded; add an intermediate breakpoint","Tools can't be cached","Model changed"),"B","<b>20-block lookback</b> exceeded."],
+  ["A14","Programmatic tool calling reduces token cost by:",O("Compressing the system prompt","Running calls in a script so intermediate results stay out of context","Using a cheaper model","Disabling thinking"),"B","Intermediate results <b>stay out of Claude's context</b>; only final output returns."],
+  ["A15","Tool search beats loading all schemas upfront because it:",O("Appends discovered schemas (preserves cache)","Removes the need for descriptions","Runs tools server-side","Doubles the context window"),"A","It <b>appends</b> schemas, preserving the cache."],
+  ["A16","fable-5 declines mid-stream after partial output. Correct handling:",O("Treat partial output as final","Discard the partial (billed, incomplete) and handle refusal","Partial is never billed","Auto-retry on same model"),"B","Mid-stream refusal bills the partial; <b>discard it</b>."],
+  ["A17","Server-side fallbacks supported target model at launch:",O("claude-haiku-4-5","claude-opus-4-8","claude-sonnet-4-5","Any model you name"),"B","<b>claude-opus-4-8</b> at launch."],
+  ["A18","Sticky routing for server-side fallbacks means:",O("Every request always hits the requested model","After a fallback, later non-streaming requests served by fallback ~1h","The fallback is permanent","Streaming pinned 24h"),"B","Non-streaming follow-ups served by the fallback for <b>~1 hour</b>."],
+  ["A19","To generate a PR on Managed Agents, besides a github_repository mount you need:",O("Nothing — the mount can open PRs","The GitHub MCP server (mount is filesystem+git only)","A second environment","A custom open_pr tool only"),"B","PR creation needs the <b>GitHub MCP server</b>."],
+  ["A20","A vault environment_variable credential is exposed to the sandbox as:",O("The real secret in an env var","An opaque placeholder; substituted at egress for allowed hosts","A file under /memories","A tool definition"),"B","An <b>opaque placeholder</b>; substituted at egress."],
+  ["A21","Keep a secret host-side when a vault doesn't fit (self-hosted sandbox):",O("Put the key in the system prompt","A custom tool: agent emits custom_tool_use, orchestrator calls the API","The Files API","The metadata field"),"B","A <b>custom tool</b> keeps the secret host-side."],
+  ["A22","When draining a session stream, break on:",O("Any session.status_idle","Idle with terminal stop_reason, or session.status_terminated","First agent.message","span.model_request_start"),"B","Break on <b>idle-with-terminal-stop-reason</b> or terminated."],
+  ["A23","SSE stream has no replay. On reconnect:",O("Resume from 'now', accept the gap","Fetch events.list() history + dedupe by ID while tailing live","Delete and recreate the session","Switch to webhooks only"),"B","Fetch history + <b>dedupe by event ID</b>."],
+  ["A24","Opus 4.8 review harness 'only high-severity' shows lower recall. Cause/fix:",O("Capability regression; downgrade","Model follows the filter literally; report everything, filter downstream","Can't review code; add tools","Increase max_tokens"),"B","4.8 follows severity filters <b>literally</b>; filter downstream."],
+  ["A25","Managed Agents availability across providers:",O("Works on Bedrock, Vertex, Foundry","First-party + Claude Platform on AWS only","Only on Bedrock","Requires a self-hosted sandbox everywhere"),"B","First-party + <b>Claude Platform on AWS</b> only."]
+ ],
+ multi:[
+  ["B1","True about cache invalidation tiers:",O("Changing tool_choice keeps tools+system cache","Toggling thinking keeps tools+system, invalidates messages downstream","Model switch forces full rebuild","Changing message content invalidates tools cache"),["A","B","C"],"Message content doesn't invalidate the tools cache (D false)."],
+  ["B2","Correct about fable-5 refusal billing:",O("Pre-output refusal (empty content) not billed","Mid-stream refusal bills the streamed output","With fallbacks, declined-before-output isn't billed; rescue bills at fallback rates","All refusals always billed in full"),["A","B","C"],"Not all refusals are billed in full (D false)."],
+  ["B3","Valid agent-specific caching workarounds:",O("Append role:'system' instead of editing top-level system","Spawn a subagent on a cheaper model vs switching the main loop","Use tool search to append schemas vs swapping tools","Re-create the agent each turn to refresh cache"),["A","B","C"],"Re-creating the agent each turn is an anti-pattern (D false)."],
+  ["B4","True about Managed Agents environments:",O("config.type is cloud or self_hosted","Names must be unique (409 on dup)","unrestricted allows full egress (except legal blocklist)","Self-hosted supports environment_variable vault creds"),["A","B","C"],"Self-hosted does NOT support env_variable vault creds (D false)."],
+  ["B5","True about high-res vision on Opus 4.7+:",O("Max resolution 2576px long edge","Coordinates map 1:1 to pixels","Full-res images can use more tokens","Requires a special beta header"),["A","B","C"],"High-res is automatic, no beta header (D false)."],
+  ["B6","Correct about caching economics/verification:",O("1h TTL writes cost ~2× and need more reads to pay off","input_tokens is the uncached remainder only","Total = input + cache_creation + cache_read","Non-zero cache_creation proves a read occurred"),["A","B","C"],"cache_creation proves a write, not a read (D false)."],
+  ["B7","Correct uses of mid-conversation system messages:",O("Preserve the cached history prefix","Prompt-injection-safe operator channel","Must follow a user message, can't be messages[0]","Supported on every model, no 400 possible"),["A","B","C"],"They're model-gated and can 400 on unsupported models (D false)."],
+  ["B8","True about choosing a surface for an agent:",O("Managed Agents = Anthropic runs the loop + hosts the sandbox","Claude API + tool use = you host compute / custom runtime","A single LLM call suffices for classification/summarization","Always build an agent regardless of complexity"),["A","B","C"],"Start simple — don't always build an agent (D false)."]
+ ],
+ scn:[
+  ["C1","Caching under load: 25K shared preamble + per-user retrieved-doc block (varies) + question. Bursty traffic w/ multi-minute idle gaps. Breakpoint strategy, TTL, pre-warm, the one ordering rule?","First breakpoint at the END of the 25K shared preamble (the reusable prefix). The per-user doc block + question come AFTER it, no breakpoint (they vary). Gaps exceed the 5-min TTL → re-warm just under TTL or use ttl:'1h' on the preamble (write ~2× but survives gaps). Pre-warm at startup with max_tokens:0 only if first-request latency is user-visible. Ordering rule: stable content (frozen system + deterministic preamble) must physically precede volatile per-request content."],
+  ["C2","Fable 5 hardening: security-tooling assistant where benign requests sometimes trip classifiers. (a) detect refusal, (b) opt-in resilience by default, (c) two ops requirements.","(a) Check response.stop_reason=='refusal' BEFORE reading content[0] (may be empty/partial). (b) Ship server-side fallbacks by default (betas:['server-side-fallback-2026-06-01'], fallbacks:[{model:'claude-opus-4-8'}]); on Bedrock/Vertex/Foundry use the client-side refusal-fallback middleware. (c) Org must meet 30-day data retention (ZDR → 400 every request); size the fallback model's rate limits for expected refusal volume, else the refusal is returned instead."],
+  ["C3","Multi-surface: regulated enterprise on AWS w/ IAM access control, wants Managed Agents + server-side tools + same-day parity. Compare Claude Platform on AWS vs Bedrock; pick + one capability missing on the rejected option.","Choose Claude Platform on AWS: Anthropic-operated, same-day API parity, supports Managed Agents + server-side tools, AWS-native IAM + Marketplace billing, bare model IDs (claude-opus-4-8). Bedrock is partner-operated, feature subset, anthropic.-prefixed IDs, and does NOT support Managed Agents or Anthropic server-side tools — failing the requirement. Capability missing on the rejected option (Bedrock): Managed Agents (and server-side tools)."]
+ ]
+}
+};
+const LETTERS=["A","B","C","D"];
+
+/* ---------------- STATE ---------------- */
+let cur="A";
+const answers={A:{},B:{},C:{}};
+const graded={A:false,B:false,C:false};
+
+/* ---------------- RENDER ---------------- */
+function buildPicker(){
+  const p=document.getElementById("picker"); p.innerHTML="";
+  Object.keys(EXAMS).forEach(k=>{
+    const b=document.createElement("button");
+    b.className="pick"+(k===cur?" active":"");
+    const sub={A:"Foundational",B:"Intermediate",C:"Advanced"}[k];
+    b.innerHTML="Form "+k+"<small>"+sub+"</small>";
+    b.onclick=()=>{cur=k;render();};
+    p.appendChild(b);
+  });
+}
+function optionRow(qid,letter,text,type){
+  const sel=type==="single"?answers[cur][qid]===letter:(answers[cur][qid]||[]).includes(letter);
+  const div=document.createElement("div");
+  div.className="opt "+(type==="single"?"single":"")+(sel?" sel":"");
+  div.dataset.qid=qid; div.dataset.letter=letter; div.dataset.type=type;
+  div.innerHTML='<div class="box">'+(type==="single"?"●":"✓")+'</div><div><span class="ol">'+letter+'.</span> '+text+'</div>';
+  div.onclick=()=>{ if(graded[cur])return; toggle(qid,letter,type); render(); };
+  return div;
+}
+function toggle(qid,letter,type){
+  if(type==="single"){answers[cur][qid]=letter;}
+  else{const a=new Set(answers[cur][qid]||[]); a.has(letter)?a.delete(letter):a.add(letter); answers[cur][qid]=[...a].sort();}
+}
+function render(){
+  buildPicker();
+  const ex=EXAMS[cur];
+  document.getElementById("formName").textContent=ex.name;
+  const exam=document.getElementById("exam"); exam.innerHTML="";
+
+  const s1=document.createElement("div"); s1.className="sec"; s1.textContent="Section 1 · Multiple choice (2 pts each)"; exam.appendChild(s1);
+  ex.single.forEach(([id,q,opts,ans,exp])=>exam.appendChild(qCard(id,q,opts,ans,exp,"single")));
+
+  const s2=document.createElement("div"); s2.className="sec"; s2.textContent="Section 2 · Select all that apply (3 pts each, all-or-nothing)"; exam.appendChild(s2);
+  ex.multi.forEach(([id,q,opts,ans,exp])=>exam.appendChild(qCard(id,q,opts,ans,exp,"multi")));
+
+  const s3=document.createElement("div"); s3.className="sec"; s3.textContent="Section 3 · Scenario design (self-check)"; exam.appendChild(s3);
+  ex.scn.forEach(([id,q,model])=>exam.appendChild(scnCard(id,q,model)));
+
+  updateProgress();
+  if(graded[cur]) applyGrade();
+}
+function qCard(id,q,opts,ans,exp,type){
+  const c=document.createElement("div"); c.className="q"; c.dataset.qid=id; c.dataset.ans=Array.isArray(ans)?ans.join(""):ans; c.dataset.type=type;
+  const t=document.createElement("div"); t.className="qt";
+  t.innerHTML='<span class="num">'+id+'</span>'+q+(type==="multi"?' <span style="color:var(--muted);font-weight:400">(select all)</span>':"");
+  c.appendChild(t);
+  LETTERS.forEach(L=>{ if(opts[L]!=null) c.appendChild(optionRow(id,L,opts[L],type)); });
+  const e=document.createElement("div"); e.className="exp"; e.innerHTML='<b>Answer: '+(Array.isArray(ans)?ans.join(", "):ans)+'</b> — '+exp; c.appendChild(e);
+  return c;
+}
+function scnCard(id,q,model){
+  const c=document.createElement("div"); c.className="q scn";
+  const t=document.createElement("div"); t.className="qt"; t.innerHTML='<span class="num">'+id+'</span>'+q; c.appendChild(t);
+  const ta=document.createElement("textarea"); ta.placeholder="Type your answer (not auto-graded)…";
+  ta.value=answers[cur]["txt_"+id]||""; ta.oninput=()=>{answers[cur]["txt_"+id]=ta.value;}; c.appendChild(ta);
+  const btn=document.createElement("button"); btn.className="reveal"; btn.textContent="Show model answer";
+  const m=document.createElement("div"); m.className="model"; m.innerHTML="<b>Model answer.</b> "+model;
+  btn.onclick=()=>{m.classList.toggle("show"); btn.textContent=m.classList.contains("show")?"Hide model answer":"Show model answer";};
+  c.appendChild(btn); c.appendChild(m);
+  return c;
+}
+function updateProgress(){
+  const ex=EXAMS[cur]; const total=ex.single.length+ex.multi.length;
+  let done=0;
+  ex.single.forEach(([id])=>{if(answers[cur][id])done++;});
+  ex.multi.forEach(([id])=>{if((answers[cur][id]||[]).length)done++;});
+  document.getElementById("progress").textContent=done+" / "+total+" answered";
+}
+
+/* ---------------- GRADE ---------------- */
+function grade(){
+  graded[cur]=true;
+  applyGrade();
+}
+function applyGrade(){
+  const ex=EXAMS[cur]; let pts=0; const max=100;
+  // section 1
+  ex.single.forEach(([id,,,ans])=>{ if(answers[cur][id]===ans) pts+=2; });
+  // section 2
+  ex.multi.forEach(([id,,,ans])=>{ const a=(answers[cur][id]||[]).slice().sort().join(""); const k=ans.slice().sort().join(""); if(a===k) pts+=3; });
+  // section 3: self-graded — assume credit shown separately; we report autoscore /74 plus note
+  // visual
+  document.querySelectorAll(".q[data-qid]").forEach(card=>{
+    const id=card.dataset.qid, type=card.dataset.type, key=card.dataset.ans;
+    const keyArr=key.split("");
+    card.querySelectorAll(".opt").forEach(opt=>{
+      const L=opt.dataset.letter; opt.style.pointerEvents="none";
+      const chosen=type==="single"?answers[cur][id]===L:(answers[cur][id]||[]).includes(L);
+      const correct=keyArr.includes(L);
+      opt.classList.remove("sel");
+      if(chosen&&correct) opt.classList.add("correct");
+      else if(chosen&&!correct) opt.classList.add("wrong");
+      else if(!chosen&&correct) opt.classList.add("missed");
+    });
+    card.querySelector(".exp").classList.add("show");
+  });
+  const auto=pts, autoMax=74;
+  const sb=document.getElementById("scoreBox");
+  const pct=Math.round(auto/autoMax*100);
+  sb.innerHTML='Auto-graded (S1+S2): <b>'+auto+' / 74</b> · scenarios self-scored /26. '+
+    '<span class="'+(pct>=75?"pass":"fail")+'">'+(pct>=75?"On track to pass":"Below pass on objective Qs")+'</span>';
+  document.getElementById("gradeBtn").textContent="Graded";
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+function reset(){
+  answers[cur]={}; graded[cur]=false;
+  document.getElementById("gradeBtn").textContent="Grade";
+  document.getElementById("scoreBox").textContent="Not graded yet";
+  render();
+}
+document.getElementById("gradeBtn").onclick=grade;
+document.getElementById("resetBtn").onclick=reset;
+render();
+</script>
+</body>
+</html>
